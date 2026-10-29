@@ -22,60 +22,70 @@ RegisterNumber:  212225240111
 */
 
 
-import numpy as np
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 
-# Load dataset
-data = pd.read_csv("Startup.csv")
+#Load the Data
+data=pd.read_csv("C:/Users/acer/Downloads/50_Startups.csv")
+x=data["R&D Spend"].values
+y=data["Profit"].values
 
-# Select one feature (R&D Spend) and target (Profit)
-X = data['R&D Spend'].values
-y = data['Profit'].values
+#Feature Scaling
+x_mean=np.mean(x)
+x_std=np.std(x)
+x=(x-x_mean)/x_std
 
-# Normalize (important for gradient descent)
-X = (X - X.mean()) / X.std()
+#Parameters
+w=0.0
+b=0.0
+alpha=0.01
+epochs=100
+n=len(x)
 
-# Initialize parameters
-m = 0
-b = 0
+losses=[]
 
-learning_rate = 0.01
-epochs = 1000
-n = len(X)
-
-# Gradient Descent
+#Gradient Descent
 for i in range(epochs):
-    y_pred = m * X + b
+    y_hat=w*x+b
+    loss=np.mean((y_hat-y)**2)
+    losses.append(loss)
     
-    # Gradients
-    dm = (-2/n) * np.sum(X * (y - y_pred))
-    db = (-2/n) * np.sum(y - y_pred)
+    dw=(2/n)*np.sum((y_hat-y)*x)
+    db=(2/n)*np.sum(y_hat-y)
     
-    # Update
-    m = m - learning_rate * dm
-    b = b - learning_rate * db
+    w-=alpha*dw
+    b-=alpha*db
 
-print("Slope (m):", m)
-print("Intercept (b):", b)
+#Plot
+plt.figure(figsize=(12,5))
 
-# Predictions for plotting
-y_pred = m * X + b
+plt.subplot(1,2,1)
+plt.plot(losses)
+plt.xlabel("Iterations")
+plt.ylabel("Loss(MSE)")
+plt.title("Loss vs Iterations")
 
-# Plot
-plt.scatter(X, y)
-plt.plot(X, y_pred)
-
-plt.xlabel("R&D Spend (Normalized)")
+plt.subplot(1,2,2)
+plt.scatter(x,y)
+x_sorted=np.argsort(x)
+plt.plot(x[x_sorted],(w*x+b)[x_sorted],color="red")
+plt.xlabel("R&D Spend (scaled)")
 plt.ylabel("Profit")
-plt.title("Gradient Descent on 50_Startups Dataset")
+plt.title("Linear Regression Fit")
 
+plt.tight_layout()
 plt.show()
+
+print(f"Final weight (w): {w}")
+print(f"Final bias (b): {b}")
+
 
 ```
 
 ## Output:
-<img width="922" height="715" alt="image" src="https://github.com/user-attachments/assets/75efe5ad-ab4f-4ed0-b30e-3a3afc67e5fa" />
+<img width="937" height="432" alt="image" src="https://github.com/user-attachments/assets/f07f430f-2984-417b-a7c8-b1dc4a87b408" />
+
 
 
 
